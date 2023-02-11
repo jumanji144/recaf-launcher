@@ -28,6 +28,10 @@ require_package () {
         then
             # Install using zypper
             sudo zypper install $2
+        elif command -v nix &> /dev/null
+        then
+            #  Install using nix
+            sudo nix-env -i $2
         else
             echo "No package manager found"
             exit 1
