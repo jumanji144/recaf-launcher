@@ -1,11 +1,11 @@
 ## Recaf-Launcher
 
-A linux launcher for (Recaf)[https://github.com/Col-E/Recaf]
+A linux launcher for [Recaf](https://github.com/Col-E/Recaf)
 
 ### Usage
 
 Simply run the script.
-When no parameters are given it will download the newest (3x release)[https://github.com/Col-E/recaf-3x-issues/releases].
+When no parameters are given it will download the newest [3x release](https://github.com/Col-E/recaf-3x-issues/releases).
 When a parameter is given it can be one of these options:
 ```
 <tag> any tag form (https://github.com/Col-E/Recaf/tags)
