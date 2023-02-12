@@ -2,25 +2,44 @@ function CheckJava {
     param (
        $Required
     )
-    $path = Get-Command java -ErrorAction SilentlyContinue;
+    $found = $false;
+    $path = "";
     try {
-        $version = (Get-Command java | Select-Object -ExpandProperty Version).toString();
+        # Get all the Java installations from the registry save path and version
+        $javaInstallations = Get-ItemProperty -Path "HKLM:\SOFTWARE\JavaSoft\Java Runtime Environment" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty "JavaHome", "CurrentVersion" | Where-Object { $_.JavaHome -ne $null -and $_.CurrentVersion -ne $null };
+        # Compare the versions to the required version
+        $javaInstallations | ForEach-Object {
+            $version = $_.CurrentVersion;
+            if ($version -ge $Required) {
+                $found = $true;
+                $path = $_.JavaHome;
+            }
+        }
     } catch {
-        # install java 17 via this https://aka.ms/download-jdk/microsoft-jdk-17.0.6-windows-x64.msi
-        Invoke-WebRequest -Uri "https://corretto.aws/downloads/latest/amazon-corretto-17-x64-windows-jdk.msi" -OutFile "jdk.msi"
-        Start-Process "jdk.msi" -ArgumentList '/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTARTAPPLICATIONS /SUPPRESSMSGBOXES /DIR="C:\Program Files\Amazon Corretto"' -Wait
-        Remove-Item "jdk.msi"
-        # Set JAVA_HOME
-        $env:JAVA_HOME = "C:\Program Files\Amazon Corretto";
-        # Add JAVA_HOME to PATH
-        $env:PATH = $env:JAVA_HOME + "\bin;" + $env:PATH;
-        $version = (Get-Command java | Select-Object -ExpandProperty Version).toString();
-        $path = Get-Command java -ErrorAction SilentlyContinue;
-     }
-    if ($version -lt $Required) {
-        Write-Host "Java version $version is not supported. Please install Java $Required or higher."
-        exit 1
+        # ignore, try diffrent approach
     }
+    # if not found, try `java` command
+    if(!$found) {
+        $path = Get-Command java -ErrorAction SilentlyContinue;
+        try {
+            $version = (Get-Command java | Select-Object -ExpandProperty Version).toString();
+        } catch {
+            # install java 17 via this https://aka.ms/download-jdk/microsoft-jdk-17.0.6-windows-x64.msi
+            Invoke-WebRequest -Uri "https://corretto.aws/downloads/latest/amazon-corretto-17-x64-windows-jdk.msi" -OutFile "jdk.msi"
+            Start-Process "jdk.msi" -ArgumentList '/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /NORESTARTAPPLICATIONS /SUPPRESSMSGBOXES /DIR="C:\Program Files\Amazon Corretto"' -Wait
+            Remove-Item "jdk.msi"
+            # Set JAVA_HOME
+            $env:JAVA_HOME = "C:\Program Files\Amazon Corretto";
+            # Add JAVA_HOME to PATH
+            $env:PATH = $env:JAVA_HOME + "\bin;" + $env:PATH;
+            $version = (Get-Command java | Select-Object -ExpandProperty Version).toString();
+            $path = Get-Command java -ErrorAction SilentlyContinue;
+        }
+        if ($version -lt $Required) {
+            Write-Host "Java version $version is not supported. Please install Java $Required or higher."
+            exit 1
+        }
+    }   
     return $path;
 }
 
