@@ -1,6 +1,6 @@
 ## Recaf-Launcher
 
-A linux launcher for [Recaf](https://github.com/Col-E/Recaf)
+A launcher for [Recaf](https://github.com/Col-E/Recaf)
 
 ### Usage
 
@@ -18,3 +18,8 @@ When a parameter is given it can be one of these options:
 --list - List all avaiable tags from (https://github.com/Col-E/Recaf/tags)
 --help - Display this message
 ```
+
+#### Windows
+
+On windows either run in powershell `recaf.ps1` or `powershell.exe -file recaf.ps1 [args]`.
+If desired a batch wrapper (`recaf.bat`) is given which delegates to powershell.
