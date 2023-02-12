@@ -114,7 +114,6 @@ find_java () {
             exit 1
         fi
     fi
-    echo $JAVA_PATH
 }
 
 # First find newest 3x-snapshort
@@ -159,6 +158,7 @@ build_recaf () {
 }
 
 download_recaf () {
+    echo "Downloading Recaf $1"
     # $1 is tag name, if latest, use .[0].id
     # Get latest version stored locally
     LATEST_LOCAL=$(cat $RECAF_LATEST)
